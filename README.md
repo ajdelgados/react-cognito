@@ -14,4 +14,28 @@ Recomiendo descargar e instalar nvm para [unix, macOS o Windows Subsystem for Li
 
 Vamos a AWS Console y buscamos Cognito
 
+![Búsqueda de Cognito en la consola de AWS](https://github.com/ajdelgados/react-cognito/blob/main/public/images/1-aws-search-cognito.png?raw=true)
 
+Mostrará la pantalla de bienvenida del servicio, para esta publicación en necesario seleccionar User Pools
+
+![Bienvenida en AWS Cognito](https://github.com/ajdelgados/react-cognito/blob/main/public/images/2-cognito-main-screen.png?raw=true)
+
+En la pantalla Users Pools, seleccionamos Create a user pool
+
+![Crear un User Pool](https://github.com/ajdelgados/react-cognito/blob/main/public/images/3-create-user-pool.png?raw=true)
+
+Las siguientes pantallas serán para configurar el User Pool, para desarrollar este artículo, vamos a usar la mayoría de la opciones por defecto y solo cambiaremos las siguientes, nombrar el Pool "ajdelgados-example", seleccionar "Email address or phone number" para la pregunta cómo quieres que los usuarios inicien sesión, seleccionar "None – users will have to contact an administrator to reset their passwords" para indicar cómo el usuario podrá recuperar su cuenta y seleccionar "No verification" para indicar que atributo se debe verificar. La mayoría de los cambios en la configuración por defecto es para no configurar SNS o SES.
+
+Lo siguiente es crear una "App clients" llamada react-spa con todas las opciones por defecto
+
+![Crear una App Client](https://github.com/ajdelgados/react-cognito/blob/main/public/images/4-app-client.png?raw=true)
+
+Se debe crear el dominio para el user pool, puedes usar un domino asociado a la cuenta de AWS que tenga un certificado asociado en ACM ([AWS Certificate Manager](https://aws.amazon.com/certificate-manager/)) o reservar un dominio de prefijo en AWS Cognito, para efectos de la publicación se usará un dominio de prefijo llamado "ajdelgados-example" (primero se debe verificar si está disponible y luego guardar)
+
+![Seleccionar el dominio para el User Pool](https://github.com/ajdelgados/react-cognito/blob/main/public/images/5-user-pool-domain.png?raw=true)
+
+Asociaremos el App client con el User Pool en App client settings y se debe seleccionar Cognito User Pool (en este apartado debería aparecer otros identity providers si se tiene otros configurados), colocar http://localhost:3000/ en Callback URL(s), http://localhost:3000/signout en Sign out URL(s), selecciona Authorization code grant, email, openid y profile
+
+![Configuramos el App Client](https://github.com/ajdelgados/react-cognito/blob/main/public/images/6-app-client-settings.png?raw=true)
+
+Los pasos anteriores funcionan para tener el User Pool configurado para ser llamado desde React, solo queda crear un usuario en el user Pool para hacer las pruebas.
