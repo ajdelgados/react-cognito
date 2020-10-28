@@ -1,4 +1,4 @@
-import React, { useContext} from 'react';
+import React, { useContext } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { useLocation, useHistory } from 'react-router-dom'
@@ -15,42 +15,46 @@ function App() {
     history.push("/");
     dispatch({ type: 'LOAD_USER_INFORMATION' })
     setTimeout( () => {
-    fetch(`https://${process.env.REACT_APP_COGNITO_DOMAIN}.auth.${process.env.REACT_APP_COGNITO_AWS_REGION}.amazoncognito.com/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${process.env.REACT_APP_COGNITO_SECRET}`
-      },
-      body: `grant_type=authorization_code&redirect_uri=${process.env.REACT_APP_COGNITO_REDIRECT_URI}&client_id=${process.env.REACT_APP_COGNITO_CLIENT_ID}&code=${code}`
-    })
-    .then(response => response.json())
-    .then(data => {
-      fetch(`https://${process.env.REACT_APP_COGNITO_DOMAIN}.auth.${process.env.REACT_APP_COGNITO_AWS_REGION}.amazoncognito.com/oauth2/userInfo`, {
-      headers: {
-        'Authorization': `Bearer ${data.access_token}`
-      }})
-      .then( responseUserInfo => responseUserInfo.json())
-      .then(dataUserInfo => {
-        dispatch({
-          type: 'LOADED_USER_INFORMATION',
-          payload: dataUserInfo
-        })
+      fetch(`https://${process.env.REACT_APP_COGNITO_DOMAIN}.auth.${process.env.REACT_APP_COGNITO_AWS_REGION}.amazoncognito.com/oauth2/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${process.env.REACT_APP_COGNITO_SECRET}`
+        },
+        body: `grant_type=authorization_code&redirect_uri=${process.env.REACT_APP_COGNITO_REDIRECT_URI}&client_id=${process.env.REACT_APP_COGNITO_CLIENT_ID}&code=${code}`
       })
-      .catch(errUserInfo => { 
-        console.log("errUserInfo")
-        console.log(errUserInfo)
+      .then(response => response.json())
+      .then(data => {
+        if(!data.access_token) {
+          dispatch({ type: 'FAIL_USER_INFORMATION' })
+        } else {
+          fetch(`https://${process.env.REACT_APP_COGNITO_DOMAIN}.auth.${process.env.REACT_APP_COGNITO_AWS_REGION}.amazoncognito.com/oauth2/userInfo`, {
+          headers: {
+            'Authorization': `Bearer ${data.access_token}`
+          }})
+          .then( responseUserInfo => responseUserInfo.json())
+          .then(dataUserInfo => {
+            dispatch({
+              type: 'LOADED_USER_INFORMATION',
+              payload: dataUserInfo
+            })
+          })
+          .catch(() => {
+            dispatch({ type: 'FAIL_USER_INFORMATION' })
+          })
+        }
       })
-    })
-    .catch(err => { 
-      console.log("err")
-      console.log(err)
-    })}, 10000)
+      .catch(() => { 
+        dispatch({ type: 'FAIL_USER_INFORMATION' })
+      })
+    }, 1000)
   }
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        { state.message ?? <div>{state.message}</div> }
         {
           !state.loading ? state.authenticated ?
           <div>

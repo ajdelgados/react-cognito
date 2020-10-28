@@ -8,14 +8,24 @@ const reducer = (state, action) => {
       return {
         ...state,
         loading: true,
+        message: null,
       };
     }
     case "LOADED_USER_INFORMATION": {
       return {
-        ...state,
         loading: false,
         authenticated: true,
+        message: null,
         payload: action.payload
+
+      };
+    }
+    case "FAIL_USER_INFORMATION": {
+      return {
+        loading: false,
+        authenticated: false,
+        message: "Authentication fail",
+        payload: {}
 
       };
     }
@@ -27,6 +37,7 @@ const reducer = (state, action) => {
 const initialState = {
   loading: false,
   authenticated: false,
+  message: null,
   payload: {}
 };
 
